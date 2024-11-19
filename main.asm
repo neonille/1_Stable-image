@@ -6,9 +6,9 @@
 ; COMPILER METADATA 
 ; Import the VCS header file and set the origin for all memory adressing
 ; -------------------------------------------------------------------------------------------------
-  PROCESSOR 6502
-	INCLUDE "vcs.h"
-	ORG $F000
+    PROCESSOR 6502
+    INCLUDE "vcs.h"
+    ORG $F000
 ; -------------------------------------------------------------------------------------------------
 ; SETUP
 ; First disable interrupts. This is completly unneccessary but good practice apparently 🤷‍♂️
@@ -17,41 +17,41 @@
 ; Finally, clear memory
 ; -------------------------------------------------------------------------------------------------
 SETUP:
-  SEI 
-  CLD 
-  LDX #$FF 
-  TXS 
-  LDA #$00
+    SEI 
+    CLD 
+    LDX #$FF 
+    TXS 
+    LDA #$00
 CLEAR:
-  STA 0,X
-  DEX
-  BNE CLEAR
+    STA 0,X
+    DEX
+    BNE CLEAR
 ; -------------------------------------------------------------------------------------------------
 
 ; Set the background colors
 ; First
-  LDA #$C6
-  STA $83
+    LDA #$C6
+    STA $83
 ; Second
-  LDA #$86
-  STA $82
+    LDA #$86
+    STA $82
 ; Third
-  LDA #$66
-  STA $81
+    LDA #$66
+    STA $81
 
 ; Main loop
 MAIN:
-  JSR SYNC
-  JSR TOP
-  LDA #0
-  STA VBLANK
+    JSR SYNC
+    JSR TOP
+    LDA #0
+    STA VBLANK
 
-  JSR FRAME
+    JSR FRAME
 
-  LDA #2
-  STA VBLANK
-  JSR BOTTOM
-  JMP MAIN
+    LDA #2
+    STA VBLANK
+    JSR BOTTOM
+    JMP MAIN
 
 ; Syncronize the program with the TV (vertical sync)
 SYNC:
@@ -95,6 +95,6 @@ BOTTOM_LOOP:
     BNE BOTTOM_LOOP
     RTS
 
-	ORG $FFFC
-	.word SETUP
-  .word SETUP
+    ORG $FFFC
+    .word SETUP
+    .word SETUP
