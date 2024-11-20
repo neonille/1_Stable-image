@@ -5,8 +5,8 @@ AUDF0                    0017
 AUDF1                    0018                  
 AUDV0                    0019                  
 AUDV1                    001a                  
-BOTTOM                   f058              (R )
-BOTTOM_LOOP              f05a              (R )
+BOTTOM                   f059              (R )
+BOTTOM_LOOP              f05b              (R )
 CLEAR                    f007              (R )
 COLUBK                   0009              (R )
 COLUP0                   0006                  
@@ -25,7 +25,6 @@ CXPPMM                   0007
 ENABL                    001f                  
 ENAM0                    001d                  
 ENAM1                    001e                  
-FRAME                    f046              (R )
 GRP0                     001b                  
 GRP1                     001c                  
 HMBL                     0024                  
@@ -42,16 +41,17 @@ INPT3                    000b
 INPT4                    000c                  
 INPT5                    000d                  
 INTIM                    0284                  
-LOAD_NEW_COLOR           f048              (R )
 MAIN                     f018              (R )
 NUSIZ0                   0004                  
 NUSIZ1                   0005                  
 PF0                      000d                  
 PF1                      000e                  
 PF2                      000f                  
+PRELOAD_BACKGROUND_COLOR f06b              (R )
+PREPARE_NEXT_COLOR       f049              (R )
 REFP0                    000b                  
 REFP1                    000c                  
-RENDER_COLOR             f04f              (R )
+RENDER_COLOR_LINE        f04b              (R )
 RESBL                    0014                  
 RESM0                    0012                  
 RESM1                    0013                  
@@ -61,11 +61,12 @@ RESP0                    0010
 RESP1                    0011                  
 RSYNC                    0003                  
 SETUP                    f000              (R )
+SHOW_FRAME               f047              (R )
 SWACNT                   0281                  
 SWBCNT                   0283                  
 SWCHA                    0280                  
 SWCHB                    0282                  
-SYNC                     f02f              (R )
+SYNC                     f030              (R )
 T1024T                   0297                  
 TIA_BASE_ADDRESS         0000              (R )
 TIA_BASE_READ_ADDRESS    0000              (R )
@@ -74,8 +75,10 @@ TIM1T                    0294
 TIM64T                   0296                  
 TIM8T                    0295                  
 TIMINT                   0285                  
-TOP                      f03e              (R )
-TOP_LOOP                 f040              (R )
+TOP                      f03f              (R )
+TOP_LOOP                 f041              (R )
+TURN_OFF_VBLANK          f061              (R )
+TURN_ON_VBLANK           f066              (R )
 VBLANK                   0001              (R )
 VDELBL                   0027                  
 VDELP0                   0025                  

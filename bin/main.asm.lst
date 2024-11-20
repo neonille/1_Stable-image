@@ -212,92 +212,147 @@
     200  10000 ????						; EOF
 ------- FILE main.asm
      11  f000					      ORG	$F000
-     12  f000							; -------------------------------------------------------------------------------------------------
-     13  f000							; SETUP
-     14  f000							; First disable interrupts. This is completly unneccessary but good practice apparently 🤷‍♂️
-     15  f000							; Then clear decimal mode
-     16  f000							; Set the stack pointer to FF
-     17  f000							; Finally, clear memory
-     18  f000							; -------------------------------------------------------------------------------------------------
-     19  f000				   SETUP
-     20  f000		       78		      SEI
-     21  f001		       d8		      CLD
-     22  f002		       a2 ff		      LDX	#$FF
-     23  f004		       9a		      TXS
-     24  f005		       a9 00		      LDA	#$00
-     25  f007				   CLEAR
-     26  f007		       95 00		      STA	0,X
-     27  f009		       ca		      DEX
-     28  f00a		       d0 fb		      BNE	CLEAR
-     29  f00c							; -------------------------------------------------------------------------------------------------
-     30  f00c
-     31  f00c							; Set the background colors
-     32  f00c							; First
-     33  f00c		       a9 c6		      LDA	#$C6
-     34  f00e		       85 83		      STA	$83
-     35  f010							; Second
-     36  f010		       a9 86		      LDA	#$86
-     37  f012		       85 82		      STA	$82
-     38  f014							; Third
-     39  f014		       a9 66		      LDA	#$66
-     40  f016		       85 81		      STA	$81
-     41  f018
-     42  f018							; Main loop
-     43  f018				   MAIN
-     44  f018		       20 2f f0 	      JSR	SYNC
-     45  f01b		       20 3e f0 	      JSR	TOP
-     46  f01e		       a9 00		      LDA	#0
-     47  f020		       85 01		      STA	VBLANK
-     48  f022
-     49  f022		       20 46 f0 	      JSR	FRAME
-     50  f025
-     51  f025		       a9 02		      LDA	#2
-     52  f027		       85 01		      STA	VBLANK
-     53  f029		       20 58 f0 	      JSR	BOTTOM
-     54  f02c		       4c 18 f0 	      JMP	MAIN
-     55  f02f
-     56  f02f							; Syncronize the program with the TV (vertical sync)
-     57  f02f				   SYNC
-     58  f02f		       a9 02		      LDA	#2
-     59  f031		       85 00		      STA	VSYNC
-     60  f033		       85 02		      STA	WSYNC
-     61  f035		       85 02		      STA	WSYNC
-     62  f037		       85 02		      STA	WSYNC
-     63  f039		       a9 00		      LDA	#0
-     64  f03b		       85 00		      STA	VSYNC
-     65  f03d		       60		      RTS
-     66  f03e
-     67  f03e							; Render the black top part of the screen
-     68  f03e				   TOP
-     69  f03e		       a2 25		      LDX	#37
-     70  f040				   TOP_LOOP
-     71  f040		       85 02		      STA	WSYNC
-     72  f042		       ca		      DEX
-     73  f043		       d0 fb		      BNE	TOP_LOOP
-     74  f045		       60		      RTS
-     75  f046
-     76  f046				   FRAME
-     77  f046		       a0 03		      LDY	#3
-     78  f048				   LOAD_NEW_COLOR
-     79  f048		       b9 80 00 	      LDA	$80,Y
-     80  f04b		       85 09		      STA	COLUBK
-     81  f04d		       a2 40		      LDX	#192/3
-     82  f04f				   RENDER_COLOR
-     83  f04f		       85 02		      STA	WSYNC
-     84  f051		       ca		      DEX
-     85  f052		       d0 fb		      BNE	RENDER_COLOR
-     86  f054		       88		      DEY
-     87  f055		       d0 f1		      BNE	LOAD_NEW_COLOR
-     88  f057		       60		      RTS
-     89  f058
-     90  f058				   BOTTOM
-     91  f058		       a2 1e		      LDX	#30
-     92  f05a				   BOTTOM_LOOP
-     93  f05a		       85 02		      STA	WSYNC
-     94  f05c		       ca		      DEX
-     95  f05d		       d0 fb		      BNE	BOTTOM_LOOP
-     96  f05f		       60		      RTS
-     97  f060
-     98  fffc					      ORG	$FFFC
-     99  fffc		       00 f0		      .word.w	SETUP
-    100  fffe		       00 f0		      .word.w	SETUP
+     12  f000
+     13  f000
+     14  f000							; -------------------------------------------------------------------------------------------------
+     15  f000							; SETUP
+     16  f000							; First disable interrupts. This is completly unneccessary but good practice apparently 🤷‍♂️
+     17  f000							; Then clear decimal mode
+     18  f000							; Set the stack pointer to FF
+     19  f000							; Finally, clear memory
+     20  f000							; -------------------------------------------------------------------------------------------------
+     21  f000				   SETUP
+     22  f000		       78		      SEI
+     23  f001		       d8		      CLD
+     24  f002		       a2 ff		      LDX	#$FF
+     25  f004		       9a		      TXS
+     26  f005		       a9 00		      LDA	#$00
+     27  f007				   CLEAR
+     28  f007		       95 00		      STA	0,X
+     29  f009		       ca		      DEX
+     30  f00a		       d0 fb		      BNE	CLEAR
+     31  f00c
+     32  f00c
+     33  f00c							; -------------------------------------------------------------------------------------------------
+     34  f00c							; BACKGROUND COLORS
+     35  f00c							; Set the three background colors to use
+     36  f00c							; The order of the registries used are reversed due to counting down when picking colors
+     37  f00c							; -------------------------------------------------------------------------------------------------
+     38  f00c							; First
+     39  f00c		       a9 c6		      LDA	#$C6
+     40  f00e		       85 83		      STA	$83
+     41  f010							; Second
+     42  f010		       a9 86		      LDA	#$86
+     43  f012		       85 82		      STA	$82
+     44  f014							; Third
+     45  f014		       a9 66		      LDA	#$66
+     46  f016		       85 81		      STA	$81
+     47  f018
+     48  f018
+     49  f018							; -------------------------------------------------------------------------------------------------
+     50  f018							; MAIN LOOP
+     51  f018							; The main loop of the program
+     52  f018							; -------------------------------------------------------------------------------------------------
+     53  f018				   MAIN
+     54  f018		       20 30 f0 	      JSR	SYNC
+     55  f01b		       20 6b f0 	      JSR	PRELOAD_BACKGROUND_COLOR
+     56  f01e		       20 3f f0 	      JSR	TOP
+     57  f021		       20 61 f0 	      JSR	TURN_OFF_VBLANK
+     58  f024		       20 47 f0 	      JSR	SHOW_FRAME
+     59  f027		       20 66 f0 	      JSR	TURN_ON_VBLANK
+     60  f02a		       20 59 f0 	      JSR	BOTTOM
+     61  f02d		       4c 18 f0 	      JMP	MAIN
+     62  f030
+     63  f030
+     64  f030							; -------------------------------------------------------------------------------------------------
+     65  f030							; VETICAL SYNC
+     66  f030							; Syncronize the program with the TV (vertical sync)
+     67  f030							; -------------------------------------------------------------------------------------------------
+     68  f030				   SYNC
+     69  f030		       a9 02		      LDA	#2
+     70  f032		       85 00		      STA	VSYNC
+     71  f034		       85 02		      STA	WSYNC
+     72  f036		       85 02		      STA	WSYNC
+     73  f038		       85 02		      STA	WSYNC
+     74  f03a		       a9 00		      LDA	#0
+     75  f03c		       85 00		      STA	VSYNC
+     76  f03e		       60		      RTS
+     77  f03f
+     78  f03f
+     79  f03f							; -------------------------------------------------------------------------------------------------
+     80  f03f							; RENDERING BLACK TOP
+     81  f03f							; Render the black top part of the screen
+     82  f03f							; -------------------------------------------------------------------------------------------------
+     83  f03f				   TOP
+     84  f03f		       a2 25		      LDX	#37
+     85  f041				   TOP_LOOP
+     86  f041		       85 02		      STA	WSYNC
+     87  f043		       ca		      DEX
+     88  f044		       d0 fb		      BNE	TOP_LOOP
+     89  f046		       60		      RTS
+     90  f047
+     91  f047
+     92  f047							; -------------------------------------------------------------------------------------------------
+     93  f047							; RENDERING FRAME
+     94  f047							; Render the colors on the screen
+     95  f047							; -------------------------------------------------------------------------------------------------
+     96  f047				   SHOW_FRAME
+     97  f047		       a0 03		      LDY	#3
+     98  f049				   PREPARE_NEXT_COLOR
+     99  f049		       a2 40		      LDX	#192/3
+    100  f04b				   RENDER_COLOR_LINE
+    101  f04b		       85 02		      STA	WSYNC
+    102  f04d		       ca		      DEX
+    103  f04e		       d0 fb		      BNE	RENDER_COLOR_LINE
+    104  f050		       88		      DEY
+    105  f051		       b9 80 00 	      LDA	$80,Y
+    106  f054		       85 09		      STA	COLUBK
+    107  f056		       d0 f1		      BNE	PREPARE_NEXT_COLOR
+    108  f058		       60		      RTS
+    109  f059
+    110  f059
+    111  f059							; -------------------------------------------------------------------------------------------------
+    112  f059							; RENDERING BLACK BOTTOM
+    113  f059							; Render the black bottom part of the screen
+    114  f059							; -------------------------------------------------------------------------------------------------
+    115  f059				   BOTTOM
+    116  f059		       a2 1e		      LDX	#30
+    117  f05b				   BOTTOM_LOOP
+    118  f05b		       85 02		      STA	WSYNC
+    119  f05d		       ca		      DEX
+    120  f05e		       d0 fb		      BNE	BOTTOM_LOOP
+    121  f060		       60		      RTS
+    122  f061
+    123  f061
+    124  f061							; -------------------------------------------------------------------------------------------------
+    125  f061							; TURN OFF AND ON VBLANK
+    126  f061							; -------------------------------------------------------------------------------------------------
+    127  f061				   TURN_OFF_VBLANK
+    128  f061		       a9 00		      LDA	#0
+    129  f063		       85 01		      STA	VBLANK
+    130  f065		       60		      RTS
+    131  f066
+    132  f066				   TURN_ON_VBLANK
+    133  f066		       a9 02		      LDA	#2
+    134  f068		       85 01		      STA	VBLANK
+    135  f06a		       60		      RTS
+    136  f06b
+    137  f06b							; -------------------------------------------------------------------------------------------------
+    138  f06b							; PRELOAD BACKGROUND COLOR
+    139  f06b							; Set the background color to the first color again
+    140  f06b							; This is to avoid a small line of the last color on the first line of the screen
+    141  f06b							; -------------------------------------------------------------------------------------------------
+    142  f06b				   PRELOAD_BACKGROUND_COLOR
+    143  f06b		       a5 83		      LDA	$83
+    144  f06d		       85 09		      STA	COLUBK
+    145  f06f		       60		      RTS
+    146  f070							; -------------------------------------------------------------------------------------------------
+    147  f070
+    148  f070
+    149  f070							; -------------------------------------------------------------------------------------------------
+    150  f070							; Set the startup point of the program
+    151  f070							; -------------------------------------------------------------------------------------------------
+    152  fffc					      ORG	$FFFC
+    153  fffc		       00 f0		      .word.w	SETUP
+    154  fffe		       00 f0		      .word.w	SETUP
+    155  10000							; -------------------------------------------------------------------------------------------------
