@@ -4,4 +4,7 @@
 
 ![Example Image](image.png)
 
-### Probably the most documented code i've ever written...
+### Not much to brag about but probably the most well documented code i've ever written...
+
+#### main.asm          - The code
+#### bin/main.asm.bin  - The binary, works on any Atari 2600 emulator
