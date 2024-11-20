@@ -6,5 +6,5 @@
 
 ### Not much to brag about but probably the most well documented code i've ever written...
 
-#### main.asm          - The code
-#### bin/main.asm.bin  - The binary, works on any Atari 2600 emulator
+### `main.asm`          - The code
+### `bin/main.asm.bin`  - The binary, works on any Atari 2600 emulator
